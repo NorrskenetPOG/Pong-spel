@@ -9,7 +9,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 canvas.style.width = '100%';
 canvas.style.height = '100%';
-
+console.log('hej');
 let c = canvas.getContext('2d');
 let colour = '#255867';
 let startButton = ' ';
