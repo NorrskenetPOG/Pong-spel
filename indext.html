@@ -10,28 +10,67 @@
 
   <body>
     <div id="super-container">
-      <div id="vertical-dotted-line"></div>
-      <div id="start-container">
-        <h1 class="start-text">Tryck på "Spacebar" för att starta</h1>
-      </div>
-      <div id="time-container">
+      <div id="vertical-dotted-line" style="display: none"></div>
+      <div id="time-container" style="display: none">
         <div id="Timer">
           <h2>Tid</h2>
           <p id="TimerDisplay">0:0</p>
         </div>
       </div>
-      <div id="round-container">
+      <div id="round-container" style="display: none">
         <h1 id="round-text">Round&nbsp;</h1>
         <h1 class="round-number">1</h1>
       </div>
-      <div id="header-container">
+      <div id="pong-container" style="display: block">
+        <h1 class="pong-text">Pong</h1>
+      </div>
+      <div id="header-container" style="display: none">
         <h1 class="player-score">0</h1>
         <p>&nbsp;&nbsp;&nbsp;</p>
         <h1 id="header-text">Pong</h1>
         <p>&nbsp;&nbsp;&nbsp;</p>
         <h1 class="computer-score">0</h1>
       </div>
-      <div id="canvas-container">
+      <input
+        id="player-vs-player"
+        type="button"
+        value="Spelare VS Spelare"
+        onclick="showMorePvsP()"
+      />
+      <input
+        id="return-menu"
+        type="button"
+        value="Tillbaka"
+        onclick="showLess()"
+        style="display: none"
+      />
+      <input
+        id="player-vs-computer"
+        type="button"
+        value="Spelare VS Dator"
+        onclick="showMorePvsC()"
+      />
+      <input
+        id="start-gamePvsP"
+        type="button"
+        value="Starta"
+        style="display: none"
+        onclick="gameStartPvsP()"
+      />
+      <input
+        id="start-gamePvsC"
+        type="button"
+        value="Starta"
+        style="display: none"
+        onclick="gameStartPvsC()"
+      />
+      <input
+        id="refresh-button"
+        type="button"
+        value="Spela igen?"
+        style="display: none"
+        onclick="refresh()"
+      />
         <canvas id="canvas"></canvas>
       </div>
     </div>
