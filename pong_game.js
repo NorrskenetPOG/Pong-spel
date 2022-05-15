@@ -2,17 +2,23 @@ var keyState = {};
 let canvas = document.querySelector('canvas');
 let score1 = document.querySelector('.player-score');
 let round = document.querySelector('.round-number');
-let startText = document.querySelector('.start-text');
 let vertticalDottedLine = document.querySelector('.vertical-dotted-line');
 let scoreComputer = document.querySelector('.computer-score');
+let pong = document.querySelector('.pong-text');
+var playerVsPlayer = document.getElementById('player-vs-player');
+var returnMenu = document.getElementById('return-menu');
+var playerVsComputer = document.getElementById('player-vs-computer');
+var startGamePvsP = document.getElementById('start-gamePvsP');
+var startGamePvsC = document.getElementById('start-gamePvsC');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-canvas.style.width = '100%';
+canvas.style.width = '60%';
 canvas.style.height = '100%';
 
 let c = canvas.getContext('2d');
 let colour = '#255867';
-let startButton = ' ';
+let colourComputer = '#faf9f6';
+let colourPlayer = '#faf9f6';
 
 // Sidlängd för racketar och radie för bollen
 let sizeBall = canvas.height / 30;
@@ -41,8 +47,9 @@ let p1Y = canvas.height / 2 - sizeYRackets / 2;
 // Variabel som avgör om tiden stannar
 let setTime = true;
 
-// Variabel som avgör om gameLoop() körs eller avslutas
-let loopFunction = gameLoop;
+// Variabel som avgör om gameLoopPvsP/C() körs eller avslutas
+let loopFunctionPvsP = gameLoopPvsP;
+let loopFunctionPvsC = gameLoopPvsC;
 
 function timer() {
   let minut = 0;
@@ -88,7 +95,7 @@ function paintGeometrics() {
     xPosBall,
     yPosBall,
     sizeBall / 2,
-    (0.7 * sizeBall) / 2,
+    (0.6 * sizeBall) / 2,
     0,
     0,
     2 * Math.PI
@@ -96,11 +103,11 @@ function paintGeometrics() {
   c.fill();
 
   // Spelarens racket ritas
-  c.fillStyle = '#faf9f6';
+  c.fillStyle = colourPlayer;
   c.fillRect(0 + sizeXRackets * 2, p1Y, sizeXRackets, sizeYRackets);
 
   // Datorns racket ritas
-  c.fillStyle = '#faf9f6';
+  c.fillStyle = colourComputer;
   c.fillRect(
     canvas.width - sizeXRackets - sizeXRackets * 2,
     computerY,
@@ -135,8 +142,6 @@ function bounceModifyY() {
   } else {
     dyBall = dyBall - canvas.height / 5000;
   }
-  console.log(dyBall);
-  console.log(canvas.height / 5000);
 }
 
 // Då respektive kvadrat kommer till en ytterkant ska de studsa
@@ -168,8 +173,8 @@ function checkBounce() {
   if (
     xPosBall < 0 + sizeXRackets * 3 + sizeBall / 2 &&
     xPosBall > 0 + sizeXRackets * 2 + sizeBall / 2 &&
-    yPosBall < p1Y + sizeYRackets &&
-    yPosBall > p1Y
+    yPosBall < p1Y + sizeYRackets + sizeBall / 4 &&
+    yPosBall > p1Y - sizeBall / 4
   ) {
     xPosBall = sizeXRackets * 3 + sizeBall;
     dxBall = -dxBall;
@@ -178,8 +183,8 @@ function checkBounce() {
   if (
     xPosBall > canvas.width - sizeBall / 2 - sizeXRackets * 3 &&
     xPosBall < canvas.width - sizeBall / 2 - sizeXRackets * 2 &&
-    yPosBall < computerY + sizeYRackets &&
-    yPosBall > computerY
+    yPosBall < computerY + sizeYRackets + sizeBall / 4 &&
+    yPosBall > computerY - sizeBall / 4
   ) {
     xPosBall = canvas.width - sizeXRackets * 3 - sizeBall;
     dxBall = -dxBall;
@@ -190,10 +195,10 @@ function checkBounce() {
   if (
     xPosBall < canvas.width - sizeBall / 2 &&
     xPosBall > canvas.width - sizeXRackets - sizeXRackets * 2 &&
-    yPosBall < computerY + sizeYRackets + (0.7 * sizeBall) / 2 &&
+    yPosBall < computerY + sizeYRackets + (0.6 * sizeBall) / 2 &&
     yPosBall > computerY
   ) {
-    yPosBall = computerY + sizeYRackets + 0.7 * sizeBall;
+    yPosBall = computerY + sizeYRackets + 0.6 * sizeBall;
     dyBall = -dyBall;
   }
   //Gör att bollen studsar på ovansidan av datorn
@@ -201,19 +206,19 @@ function checkBounce() {
     xPosBall < canvas.width - sizeBall / 2 &&
     xPosBall > canvas.width - sizeXRackets - sizeXRackets * 2 &&
     yPosBall < computerY + sizeYRackets &&
-    yPosBall > computerY - (0.7 * sizeBall) / 2
+    yPosBall > computerY - (0.6 * sizeBall) / 2
   ) {
-    yPosBall = computerY - 0.7 * sizeBall;
+    yPosBall = computerY - 0.6 * sizeBall;
   }
 
   //Gör att bollen studsar på undersidan av spelaren
   if (
     xPosBall > 0 + sizeXRackets * 2 &&
     xPosBall < 0 + sizeXRackets * 3 &&
-    yPosBall < p1Y + sizeYRackets + (0.7 * sizeBall) / 2 &&
+    yPosBall < p1Y + sizeYRackets + (0.6 * sizeBall) / 2 &&
     yPosBall > p1Y + sizeYRackets / 2
   ) {
-    yPosBall = p1Y + sizeYRackets + 0.7 * sizeBall;
+    yPosBall = p1Y + sizeYRackets + 0.6 * sizeBall;
     dyBall = -dyBall;
   }
   //Gör att bollen studsar på ovansidan av spelaren
@@ -221,9 +226,9 @@ function checkBounce() {
     xPosBall > 0 + sizeXRackets * 2 &&
     xPosBall < 0 + sizeXRackets * 3 &&
     yPosBall < p1Y + sizeYRackets / 2 &&
-    yPosBall > p1Y - (0.7 * sizeBall) / 2
+    yPosBall > p1Y - (0.6 * sizeBall) / 2
   ) {
-    yPosBall = p1Y - 0.7 * sizeBall;
+    yPosBall = p1Y - 0.6 * sizeBall;
     dyBall = -dyBall;
   }
 }
@@ -245,7 +250,7 @@ function computerMovment() {
   }
 }
 
-//Avgör vad som händer vid 5 poäng
+// Avgör vad som händer vid 5 poäng mot datorn
 function scoreDeterminant() {
   // Ökar nummer på rundan, ställer tillbaka poängen och ändrar färg på bakgrunden
   //(allt efter att spelaren uppnår 5 poäng)
@@ -259,7 +264,6 @@ function scoreDeterminant() {
     score1.innerHTML = 0;
     scoreComputer.innerHTML = 0;
     let randomNumber = Math.floor(Math.random() * 4) + 1;
-    console.log(round.innerHTML);
 
     if (randomNumber == 1) {
       colour = '#255867';
@@ -271,19 +275,89 @@ function scoreDeterminant() {
       colour = '#dada2b';
     }
   }
+  // Avslutar spelet pgaförlust mot datorn vid 5 poäng
   if (scoreComputer.innerHTML >= 5) {
     setTime = false;
-    loopFunction = 0;
-
-    startText.innerHTML =
-      ' - - - - - - Du har förlorat - - - - - - CTRL + R för att kunna spela igen';
+    loopFunctionPvsC = 0;
+    pong.innerHTML = 'Du har förlorat';
+    lossHide();
   }
-
-  // Avslutar spelet pgaförlust mot datorn vid 5 poäng
 }
 
-// Själva huvudloopen
-function gameLoop() {
+// Avgör vad som händer vid 5 poäng spelare mor spelare
+function scoreDeterminant2() {
+  if (score1.innerHTML >= 5) {
+    setTime = false;
+    loopFunctionPvsP = 0;
+    pong.innerHTML = 'Blå förlorat';
+    lossHide();
+  }
+  if (scoreComputer.innerHTML >= 5) {
+    setTime = false;
+    loopFunctionPvsP = 0;
+    pong.innerHTML = 'Röd förlorade';
+    lossHide();
+  }
+}
+
+// Visa och döljer knappar
+function showMorePvsP() {
+  colourPlayer = 'red';
+  colourComputer = 'blue';
+  paintGeometrics();
+  playerVsPlayer.style.display = 'none';
+  returnMenu.style.display = 'block';
+  playerVsComputer.style.display = 'none';
+  startGamePvsP.style.display = 'block';
+  document.getElementById('pong-container').style.display = 'none';
+  document.getElementById('vertical-dotted-line').style.display = 'block';
+  document.getElementById('header-container').style.display = 'flex';
+  document.getElementById('round-container').style.display = 'flex';
+  document.getElementById('start-container').style.display = 'block';
+  document.getElementById('time-container').style.display = 'block';
+}
+function showMorePvsC() {
+  colourPlayer = '#faf9f6';
+  colourComputer = '#faf9f6';
+  paintGeometrics();
+  playerVsPlayer.style.display = 'none';
+  returnMenu.style.display = 'block';
+  playerVsComputer.style.display = 'none';
+  startGamePvsC.style.display = 'block';
+  document.getElementById('pong-container').style.display = 'none';
+  document.getElementById('vertical-dotted-line').style.display = 'block';
+  document.getElementById('time-container').style.display = 'block';
+  document.getElementById('header-container').style.display = 'flex';
+  document.getElementById('round-container').style.display = 'flex';
+  document.getElementById('start-container').style.display = 'block';
+}
+function showLess() {
+  fillBackground();
+  playerVsPlayer.style.display = 'inline-block';
+  returnMenu.style.display = 'none';
+  playerVsComputer.style.display = 'block';
+  startGamePvsP.style.display = 'none';
+  startGamePvsC.style.display = 'none';
+  document.getElementById('pong-container').style.display = 'block';
+  document.getElementById('vertical-dotted-line').style.display = 'none';
+  document.getElementById('time-container').style.display = 'none';
+  document.getElementById('header-container').style.display = 'none';
+  document.getElementById('round-container').style.display = 'none';
+  document.getElementById('start-container').style.display = 'none';
+}
+function lossHide() {
+  fillBackground();
+  document.getElementById('pong-container').style.display = 'block';
+  document.getElementById('refresh-button').style.display = 'block';
+  document.getElementById('vertical-dotted-line').style.display = 'none';
+  document.getElementById('header-container').style.display = 'none';
+  document.getElementById('round-container').style.display = 'none';
+  document.getElementById('start-container').style.display = 'none';
+  document.getElementById('time-container').style.display = 'none';
+}
+
+// De två olika huvudlooparna
+function gameLoopPvsC() {
   if (keyState['w'] && p1Y > 0) {
     p1Y -= canvas.height / 300;
   }
@@ -308,23 +382,62 @@ function gameLoop() {
 
   scoreDeterminant();
 
-  setTimeout(loopFunction, 10);
+  setTimeout(loopFunctionPvsC, 10);
+}
+function gameLoopPvsP() {
+  if (keyState['w'] && p1Y > 0) {
+    p1Y -= canvas.height / 300;
+  }
+
+  if (keyState['s'] && p1Y < canvas.height - sizeYRackets) {
+    p1Y += canvas.height / 300;
+  }
+  if (keyState['ArrowUp'] && computerY > 0) {
+    computerY -= canvas.height / 300;
+  }
+
+  if (keyState['ArrowDown'] && computerY < canvas.height - sizeYRackets) {
+    computerY += canvas.height / 300;
+  }
+
+  // Ränsar skärmen
+  c.clearRect(0, 0, canvas.width, canvas.height);
+
+  fillBackground();
+  paintGeometrics();
+
+  // Ritar ut bollen i dess nya position
+  xPosBall += dxBall;
+  yPosBall += dyBall;
+
+  checkBounce();
+
+  scoreDeterminant2();
+
+  setTimeout(loopFunctionPvsP, 10);
 }
 
 fillBackground();
-paintGeometrics();
 
 // Starta spelet / huvudprogrammet
-document.onkeydown = function (e) {
-  const key = e.key;
-  switch (key) {
-    case startButton:
-      startText.innerHTML = ' ';
-      startButton = 'Nothing';
-      chooseDirectionX();
-      chooseDirectionY();
-      timer();
-      gameLoop();
-    default:
-  }
-};
+function gameStartPvsC() {
+  startGamePvsC.style.display = 'none';
+  returnMenu.style.display = 'none';
+  chooseDirectionX();
+  chooseDirectionY();
+  timer();
+  gameLoopPvsC();
+}
+function gameStartPvsP() {
+  startGamePvsP.style.display = 'none';
+  returnMenu.style.display = 'none';
+  chooseDirectionX();
+  chooseDirectionY();
+  timer();
+  gameLoopPvsP();
+}
+
+// Laddar om spelet
+function refresh() {
+  location.reload();
+}
