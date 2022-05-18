@@ -268,11 +268,11 @@ function scoreDeterminant() {
     if (randomNumber == 1) {
       colour = '#255867';
     } else if (randomNumber == 2) {
-      colour = '#c0b21a';
+      colour = '#a88418';
     } else if (randomNumber == 3) {
-      colour = '#189f33';
+      colour = '#7e1b8b';
     } else if (randomNumber == 4) {
-      colour = '#dada2b';
+      colour = '#0e7542';
     }
   }
   // Avslutar spelet pgaförlust mot datorn vid 5 poäng
@@ -289,7 +289,7 @@ function scoreDeterminant2() {
   if (score1.innerHTML >= 5) {
     setTime = false;
     loopFunctionPvsP = 0;
-    pong.innerHTML = 'Blå förlorat';
+    pong.innerHTML = 'Blå förlorade';
     lossHide();
   }
   if (scoreComputer.innerHTML >= 5) {
